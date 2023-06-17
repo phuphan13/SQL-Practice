@@ -121,7 +121,8 @@ group by Activity, Predecessor, [Path];
 
 
 -- Example 9: Loan repayment 
-declare @Loan table (
+drop table if exists Loan;
+create table Loan  (
 	LoanID nvarchar(1),
 	Method int,
 	Amount float,
@@ -129,7 +130,7 @@ declare @Loan table (
 	APR1 float, 
 	APR2 float
 	)
-insert into @Loan values ('A',1,36000,48,8.5,0), /*Loan A, 36000, equal monthly total payment, 48 months, annual rate 8.5% */
+insert into Loan values ('A',1,36000,48,8.5,0), /*Loan A, 36000, equal monthly total payment, 48 months, annual rate 8.5% */
                          ('B',2,20000,36,8.0,10.0); /*Loan B 20000, equal montly priciple payment, 36 months, annual rate 8.0% for first 12 months, then 10.0% */
 
 with cte_loan as (
@@ -143,7 +144,7 @@ with cte_loan as (
 		   Prn = case when Method = 2 then round(cast(Amount/Schedule as float), 2) -- calculate equal pricipal payment
 		         else 0 end, 
 		   Method, R1, R2, Schedule 
-	from @Loan cross apply (select R1 = APR1/12/100, R2 = APR2/12/100) X
+	from Loan cross apply (select R1 = APR1/12/100, R2 = APR2/12/100) X
 	union all
     select LoanID, Term + 1, 
 	       Payment = case when Method = 1 then Pmt 
